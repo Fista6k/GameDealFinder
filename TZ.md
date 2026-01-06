@@ -33,10 +33,10 @@
 - image_url: Обложка
 
 ### Модель 2: Store (Магазин)
-- name: CharField (Название магазина: Steam, Epic, GOG)
-- website: URLField (Сайт)
-- api_endpoint: URLField (API для получения цен)
-- is_active: BooleanField (Активен ли магазин)
+- name: Название магазина: Steam, Epic, GOG
+- website: Сайт
+- api_endpoint: API для получения цен
+- is_active: Активен ли магазин
 
 ### Модель 3: PriceHistory (История цен)
 - game: ForeignKey к Game

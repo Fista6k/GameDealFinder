@@ -17,6 +17,22 @@ class Game(models.Model):
 
     def __str__(self):
         return self.title
+    
+    def getCurrentPrice(self):
+        latestPrice = PriceHistory.objects.filter(game=self).order_by("-recordedAt").first()
+
+        if latestPrice:
+            return {
+                "price": latestPrice.discountPrice,
+                "currency": latestPrice.currency,
+                "store": latestPrice.store,
+                "discount": latestPrice.discountPercent
+            }
+        return None
+    
+    def getLowestPrice(self):
+        lowest = PriceHistory.objects.filter(game=self, isLowest=True).first()
+        return lowest
 
     class Meta:
         verbose_name = "Игра"

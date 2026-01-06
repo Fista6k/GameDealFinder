@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1>🎮 Все игры ({{ games|length }})</h1>
+        <p class="lead">Нажми на игру, чтобы увидеть цены во всех магазинах</p>
+    </div>
+</div>
+
+<div class="row">
+    {% for item in gameData %}
+    <div class="col-md-4 mb-4">
+        <div class="card game-card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ item.game.title }}</h5>
+                <p class="card-text">
+                    <small class="text-muted">
+                        {{ item.game.developer }} • {{ item.game.release_date|date:"Y" }}
+                    </small>
+                </p>
+                
+                {% if item.game.genres %}
+                <p>
+                    {% for genre in item.game.genres.split|slice:":3" %}
+                    <span class="badge bg-secondary">{{ genre }}</span>
+                    {% endfor %}
+                </p>
+                {% endif %}
+                
+                <!-- Цена -->
+                {% if item.currentPrice %}
+                <div class="mt-3">
+                    <div class="price-new">
+                        {{ item.currentPrice.price }} {{ item.currentPrice.currency }}
+                    </div>
+                    {% if item.currentPrice.discount > 0 %}
+                    <span class="badge bg-danger">-{{ item.currentPrice.discount }}%</span>
+                    {% endif %}
+                    <small class="text-muted d-block">
+                        В {{ item.currentPrice.store }}
+                    </small>
+                </div>
+                {% else %}
+                <div class="mt-3 text-muted">Цена не указана</div>
+                {% endif %}
+                
+                <a href="{% url 'gameDetail' item.game.id %}" class="btn btn-outline-primary mt-3">
+                    Сравнить цены
+                </a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">
+            Игры не найдены. Добавьте игры через админку!
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

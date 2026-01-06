@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ game.title }} - сравнение цен{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-4">
+        {% if game.imageUrl %}
+        <img src="{{ game.image_url }}" alt="{{ game.title }}" class="img-fluid rounded shadow">
+        {% else %}
+        <div class="bg-light rounded shadow d-flex align-items-center justify-content-center" style="height: 300px;">
+            <span class="text-muted">Нет изображения</span>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-8">
+        <h1>{{ game.title }}</h1>
+        
+        <div class="mb-3">
+            {% if game.developer %}
+            <span class="badge bg-info">Разработчик: {{ game.developer }}</span>
+            {% endif %}
+            
+            {% if game.publisher %}
+            <span class="badge bg-secondary">Издатель: {{ game.publisher }}</span>
+            {% endif %}
+            
+            {% if game.release_date %}
+            <span class="badge bg-dark">Вышла: {{ game.release_date|date:"d.m.Y" }}</span>
+            {% endif %}
+        </div>
+        
+        {% if game.genres %}
+        <div class="mb-3">
+            <strong>Жанры:</strong>
+            {% for genre in game.genres.split %}
+            <span class="badge bg-primary">{{ genre }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        {% if game.platforms %}
+        <div class="mb-3">
+            <strong>Платформы:</strong>
+            {% for platform in game.platforms.split %}
+            <span class="badge bg-success">{{ platform }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        {% if game.description %}
+        <div class="mb-4">
+            <h5>Описание:</h5>
+            <p>{{ game.description }}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Текущие цены в магазинах -->
+<div class="row mb-5">
+    <div class="col-12">
+        <h2>💰 Цены в магазинах</h2>
+        
+        {% if currentPrices %}
+        <div class="row">
+            {% for store_name, price_data in currentPrices.items %}
+            <div class="col-md-4 mb-3">
+                <div class="card {% if price_data.is_lowest %}border-success border-2{% endif %}">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            {% if store_name == 'steam' %}Steam{% endif %}
+                            {% if store_name == 'epic' %}Epic Games{% endif %}
+                            {% if store_name == 'gog' %}GOG{% endif %}
+                            
+                            {% if price_data.is_lowest %}
+                            <span class="badge bg-success float-end">Исторический минимум!</span>
+                            {% endif %}
+                        </h5>
+                        
+                        <div class="mt-3">
+                            {% if price_data.discount_percent > 0 %}
+                            <span class="price-old">{{ price_data.price }} {{ price_data.currency }}</span>
+                            <div class="price-new">{{ price_data.discount_price }} {{ price_data.currency }}</div>
+                            <span class="badge bg-danger">-{{ price_data.discount_percent }}%</span>
+                            {% else %}
+                            <div class="price-new">{{ price_data.price }} {{ price_data.currency }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <small class="text-muted d-block mt-2">
+                            Обновлено: {{ price_data.recordedAt|date:"d.m.Y H:i" }}
+                        </small>
+                        
+                        <a href="{{ price_data.store.website }}" target="_blank" class="btn btn-primary mt-3">
+                            Купить в магазине
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-warning">
+            Цены для этой игры пока не загружены.
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- История цен (таблица) -->
+<div class="row">
+    <div class="col-12">
+        <h2>📊 История цен</h2>
+        
+        {% if prices %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Магазин</th>
+                        <th>Цена</th>
+                        <th>Со скидкой</th>
+                        <th>Скидка</th>
+                        <th>Дата</th>
+                        <th>Минимум</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for price in prices|slice:":10" %}
+                    <tr>
+                        <td>{{ price.store.name }}</td>
+                        <td>{{ price.price }} {{ price.currency }}</td>
+                        <td>
+                            <strong>{{ price.discountPrice }} {{ price.currency }}</strong>
+                        </td>
+                        <td>
+                            {% if price.discountPercent > 0 %}
+                            <span class="badge bg-danger">-{{ price.discountPercent }}%</span>
+                            {% else %}
+                            <span class="badge bg-secondary">0%</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ price.recordedAt|date:"d.m.Y H:i" }}</td>
+                        <td>
+                            {% if price.isLowest %}
+                            <span class="badge bg-success">✓</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            История цен пока пуста.
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="{% url 'gameList' %}" class="btn btn-outline-secondary">
+        ← Вернуться к списку игр
+    </a>
+</div>
+{% endblock %}

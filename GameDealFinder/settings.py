@@ -15,10 +15,9 @@ from dotenv import load_dotenv
 import os
 
 
-load_dotenv()
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(dotenv_path=BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
@@ -137,3 +136,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 ITAD_API_KEY = os.getenv("ITAD_API_KEY")
+if not ITAD_API_KEY:
+    raise ValueError("ITAD_API_KEY не найден! Проверьте .env файл и load_dotenv()")

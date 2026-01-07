@@ -18,6 +18,7 @@ class ITADClient:
         return responce.json()
     
     def get_game_info(self, plains):
+        print("ITAD_API_KEY:", self.api_key)
         responce = requests.get(f"{self.BASE_URL}/games/info/v1", params={
             "key": self.api_key,
             "plains": ",".join(plains),

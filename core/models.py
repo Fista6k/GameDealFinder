@@ -7,6 +7,7 @@ class Game(models.Model):
     itad_plain = models.CharField(
         max_length=255,
         unique=True,
+        null=True,
         verbose_name="ITAD plain"
     )
 
@@ -58,6 +59,7 @@ class Store(models.Model):
     itad_id = models.CharField(
         max_length=50,
         unique=True,
+        null=True,
         verbose_name="ITAD shop id"
     )
 
@@ -101,6 +103,7 @@ class PriceHistory(models.Model):
     )
     discount_percent = models.IntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(100)],
+        null=True,
         verbose_name="Скидка (%)"
     )
 

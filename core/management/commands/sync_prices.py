@@ -1,42 +1,90 @@
 from django.core.management.base import BaseCommand
-from django.db import transaction
-from models import Game, Store, PriceHistory
-from GameDealFinder.core.services.itad import ITADClient
+from ...models import Game, Store, PriceHistory
+from ...services.itad import ITADClient
+from decimal import Decimal
 
+
+BATCH_SIZE = 200
 
 class Command(BaseCommand):
     help = "Обновление цен из ITAD"
     
+    #def add_arguments(self, parser):
+    #    parser.add_argument("--country", type=str, default="US", help="ISO 3166-1 country code (e.g. US, DE, PL)")
+
     def handle(self, *args, **options):
+        games = Game.objects.exclude(itad_id__isnull=True)
+
+        if not games.exists():
+            self.stdout.write((self.style.WARNING("No games with itad_id found")))
+            return
+
+        game_map = {str(game.itad_id): game for game in games}
+        gameIds = list(game_map.keys())
+
+        self.stdout.write(f"Syncing prices for {len(gameIds)} games")
+
+        for i in range(0, len(gameIds), BATCH_SIZE):
+            batch = gameIds[i:i + BATCH_SIZE]
+            self.stdout.write(self.style.ERROR(batch))
+            self.sync_batch(batch, game_map)
+
+        self.stdout.write(self.style.SUCCESS("Price sync completed"))
+    
+    def sync_batch(self, gameIds, game_map):
         client = ITADClient()
-        games = Game.objects.all()
+        data = client.get_prices(gameIds)
+        self.stdout.write(self.style.SUCCESS(data))
+        for item in data:
+            game = game_map.get(item["id"])
+            if not game:
+                continue
+            self.stdout.write(self.style.SUCCESS(item))
+            self.save_price(game, item)
+    
+    def save_price(self, game, entry):
+        deals = entry.get("deals", [])
+        if not deals:
+            return
+        hL = entry.get("historyLow", {}).get("all", {}).get("amount")
+        history_low = Decimal(str(hL)) if hL is not None else None
 
-        plains = [game.itad_plain for game in games]
-        prices_data = client.get_prices(plains)
 
-        with transaction.atomic():
-            for plain, offers in prices_data.items():
-                game = Game.objects.get(itad_plain=plain)
+        for deal in deals:
+            shop_data = deal["shop"]
+            nameShop = shop_data["name"]
+            website = ""
+            if nameShop == "Steam":
+                website = "https://store.steampowered.com/"
+            elif nameShop == "GOG":
+                website = "https://www.gog.com/"
+            elif nameShop == "Epic Games":
+                website = "https://store.epicgames.com/"
+            else:
+                continue
+            price_data = deal["price"]
+            regular_data = deal.get("regular")
 
-                for offer in offers:
-                    shop = offer["shop"]
+            store, _ = Store.objects.get_or_create(
+                itad_id = shop_data["id"],
+                defaults={
+                    "name": nameShop,
+                    "website": website
+                }
+            )
 
-                    store, _ = Store.objects.get_or_create(
-                        itad_id = shop["id"],
-                        defaults={
-                            "name":shop["name"],
-                            "website": shop.get("url", "")
-                        }
-                    )
+            price = Decimal(price_data["amount"])
+            regular_price = Decimal(regular_data["amount"] if regular_data else price)
 
-                    PriceHistory.objects.create(
-                        game=game,
-                        store=store,
-                        price=offer["price"]["old"],
-                        discount_price=offer["price"]["new"],
-                        discount_percent=offer["price"]["cut"],
-                        currency=offer["price"]["currency"],
-                        store_url=offer.get("url", "")
-                    )
-        
-        self.stdout.write(self.style.SUCCESS("Цены обновлены"))
+            discount_percent = deal.get("cut", 0)
+
+            PriceHistory.objects.create(
+                game=game,
+                store=store,
+                price=regular_price,
+                discount_price=price,
+                discount_percent=discount_percent,
+                is_history_low = (price==history_low),
+                currency=price_data["currency"],
+                recorded_at=deal["timestamp"]
+            )

@@ -10,8 +10,7 @@ class Game(models.Model):
         null=True,
         verbose_name="ITAD plain"
     )
-
-    description = models.TextField(blank=True, verbose_name="Описание")
+    itad_id = models.UUIDField(unique=True, null=True)
     release_date = models.DateField(null=True, blank=True, verbose_name="Дата выхода")
     developer = models.CharField(max_length=255, blank=True, verbose_name="Разработчик")
     publisher = models.CharField(max_length=255, blank=True, verbose_name="Издатель")
@@ -22,11 +21,6 @@ class Game(models.Model):
         max_length=255,
         blank=True,
         verbose_name="Жанры (через запятую)"
-    )
-    platforms = models.CharField(
-        max_length=255,
-        blank=True,
-        verbose_name="Платформы (windows, linux, mac)"
     )
 
     def __str__(self):
@@ -106,6 +100,7 @@ class PriceHistory(models.Model):
         null=True,
         verbose_name="Скидка (%)"
     )
+    is_history_low = models.BooleanField(null=True, verbose_name="Исторический минимум")
 
     currency = models.CharField(
         max_length=3,

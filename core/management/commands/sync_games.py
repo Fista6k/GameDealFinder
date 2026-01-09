@@ -21,13 +21,20 @@ class Command(BaseCommand):
         created = 0
 
         for game in results:
-            slug = game.get("slug")
-
+            
+            gameInfo = client.get_game_info(game["id"])
+            slug = gameInfo.get("slug", "")
+            if not slug:
+                continue
             obj, is_created = Game.objects.update_or_create(
                 itad_plain=slug,
                 defaults={
+                    "itad_id": game.get("id", ""),
                     "title": game.get("title", ""),
-                    "description": "",
+                    "release_date": gameInfo.get("releaseDate", ""),
+                    "developer": gameInfo.get("developers", {}),
+                    "publisher": gameInfo.get("publishers", {}),
+                    "genres": gameInfo.get("tags", {}),
                     "image_url": game.get("assets", {}).get("boxart", "")
                 }
             )

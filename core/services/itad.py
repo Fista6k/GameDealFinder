@@ -12,27 +12,28 @@ class ITADClient:
         responce = requests.get(f"{self.BASE_URL}/games/search/v1", params={
             "key": self.api_key,
             "title": title,
-            "limit": 20
+            "limit": limit
         }, timeout=10)
         responce.raise_for_status()
         return responce.json()
     
-    def get_game_info(self, plains):
-        print("ITAD_API_KEY:", self.api_key)
-        responce = requests.get(f"{self.BASE_URL}/games/info/v1", params={
+    def get_game_info(self, id):
+        responce = requests.get(f"{self.BASE_URL}/games/info/v2", params={
             "key": self.api_key,
-            "plains": ",".join(plains),
+            "id": id,
         }, timeout=10)
         responce.raise_for_status()
         return responce.json()
     
-    def get_prices(self, plains, country="DE", currency="EUR"):
-        responce = requests.get(f"{self.BASE_URL}/games/prices/v2", params={
+    def get_prices(self, gameIds):
+        params = {
             "key": self.api_key,
-            "plains": ",".join(plains),
-            "country": country,
-            "currency": currency
-        }, timeout=10)
+        }
+        responce = requests.post(
+            f"{self.BASE_URL}/games/prices/v3",
+            params=params,
+            json=gameIds,
+            timeout=30)
         responce.raise_for_status()
         return responce.json()
     

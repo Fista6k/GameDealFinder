@@ -3,22 +3,23 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class Game(models.Model):
-    title = models.CharField(max_length=255, verbose_name="Название")
+    title = models.CharField(max_length=1000, verbose_name="Название")
     itad_plain = models.CharField(
         max_length=255,
         unique=True,
         null=True,
-        verbose_name="ITAD plain"
+        verbose_name="ITAD plain",
+        blank=True
     )
-    itad_id = models.UUIDField(unique=True, null=True)
+    itad_id = models.UUIDField(max_length=36, unique=True, null=True)
     release_date = models.DateField(null=True, blank=True, verbose_name="Дата выхода")
-    developer = models.CharField(max_length=255, blank=True, verbose_name="Разработчик")
-    publisher = models.CharField(max_length=255, blank=True, verbose_name="Издатель")
+    developer = models.CharField(max_length=512, blank=True, verbose_name="Разработчик")
+    publisher = models.CharField(max_length=512, blank=True, verbose_name="Издатель")
 
     image_url = models.URLField(blank=True, verbose_name="Обложка")
 
     genres = models.CharField(
-        max_length=255,
+        max_length=512,
         blank=True,
         verbose_name="Жанры (через запятую)"
     )

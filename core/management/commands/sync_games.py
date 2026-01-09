@@ -5,41 +5,41 @@ from ...services.itad import ITADClient
 class Command(BaseCommand):
     help = "Импорт игр из IsThereAnyDeal"
 
-    def add_arguments(self, parser):
-        parser.add_argument("title", type=str, help="Название игры")
-
     def handle(self, *args, **options):
         client = ITADClient()
-        title = options["title"]
+        all_chars = "abcdefghijklmnopqrstuvwxyz0123456789"
+        totalAdded = 0
 
-        results = client.search_games(title)
+        for ch in all_chars:
+            self.stdout.write(f"Fetching games starting with '{ch}'")
+            results = client.search_games(ch, limit=1000)
 
-        if not results:
-            self.stdout.write(self.style.WARNING("Игры не найдены"))
-            return
+            for game in results:
+                gameInfo = client.get_game_info(game["id"])
+                slug = gameInfo.get("slug", "")
+                if not slug:
+                    continue
 
-        created = 0
+                publishers = []
+                for pub in gameInfo.get("publishers", []):
+                    publishers.append(pub["name"])
 
-        for game in results:
-            
-            gameInfo = client.get_game_info(game["id"])
-            slug = gameInfo.get("slug", "")
-            if not slug:
-                continue
-            obj, is_created = Game.objects.update_or_create(
-                itad_plain=slug,
-                defaults={
-                    "itad_id": game.get("id", ""),
-                    "title": game.get("title", ""),
-                    "release_date": gameInfo.get("releaseDate", ""),
-                    "developer": gameInfo.get("developers", {}),
-                    "publisher": gameInfo.get("publishers", {}),
-                    "genres": gameInfo.get("tags", {}),
-                    "image_url": game.get("assets", {}).get("boxart", "")
-                }
-            )
+                devs = []
+                for dev in gameInfo.get("developers", []):
+                    devs.append(dev["name"])
 
-            if is_created:
-                created += 1
+                obj, is_created = Game.objects.update_or_create(
+                    itad_plain=slug,
+                    defaults={
+                        "itad_id": game.get("id", ""),
+                        "title": game.get("title", ""),
+                        "release_date": gameInfo.get("releaseDate", ""),
+                        "developer": devs,
+                        "publisher": publishers,
+                        "genres": ", ".join(gameInfo.get("tags", {})),
+                        "image_url": game.get("assets", {}).get("boxart", "")
+                    }
+                )
+                totalAdded += 1
         
-        self.stdout.write(self.style.SUCCESS(f"Готово. Добавлено игр: {created}"))
+        self.stdout.write(self.style.SUCCESS(f"Готово. Добавлено игр: {totalAdded}"))

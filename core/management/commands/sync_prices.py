@@ -8,9 +8,6 @@ BATCH_SIZE = 200
 
 class Command(BaseCommand):
     help = "Обновление цен из ITAD"
-    
-    #def add_arguments(self, parser):
-    #    parser.add_argument("--country", type=str, default="US", help="ISO 3166-1 country code (e.g. US, DE, PL)")
 
     def handle(self, *args, **options):
         games = Game.objects.exclude(itad_id__isnull=True)
@@ -26,7 +23,6 @@ class Command(BaseCommand):
 
         for i in range(0, len(gameIds), BATCH_SIZE):
             batch = gameIds[i:i + BATCH_SIZE]
-            self.stdout.write(self.style.ERROR(batch))
             self.sync_batch(batch, game_map)
 
         self.stdout.write(self.style.SUCCESS("Price sync completed"))
@@ -34,12 +30,10 @@ class Command(BaseCommand):
     def sync_batch(self, gameIds, game_map):
         client = ITADClient()
         data = client.get_prices(gameIds)
-        self.stdout.write(self.style.SUCCESS(data))
         for item in data:
             game = game_map.get(item["id"])
             if not game:
                 continue
-            self.stdout.write(self.style.SUCCESS(item))
             self.save_price(game, item)
     
     def save_price(self, game, entry):

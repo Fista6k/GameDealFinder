@@ -12,7 +12,7 @@ class ITADClient:
         responce = requests.get(f"{self.BASE_URL}/games/search/v1", params={
             "key": self.api_key,
             "title": title,
-            "limit": limit
+            "results": limit
         }, timeout=10)
         responce.raise_for_status()
         return responce.json()

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="game-detail">
+
+    <div class="game-header">
+        {% if game.image_url %}
+            <img src="{{ game.image_url }}" alt="{{ game.title }}" width="200">
+        {% endif %}
+
+        <div class="game-info">
+            <h1>{{ game.title }}</h1>
+
+            {% if game.release_date %}
+                <p><strong>Дата выхода:</strong> {{ game.release_date }}</p>
+            {% endif %}
+
+            {% if game.developer %}
+                <p><strong>Разработчик:</strong> {{ game.developer }}</p>
+            {% endif %}
+
+            {% if game.publisher %}
+                <p><strong>Издатель:</strong> {{ game.publisher }}</p>
+            {% endif %}
+
+            {% if game.genres %}
+                <p><strong>Жанры:</strong> {{ game.genres }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <hr>
+
+    <h2>Цены</h2>
+
+    {% if prices %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Магазин</th>
+                    <th>Цена</th>
+                    <th>Обычная</th>
+                    <th>Скидка</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for price in prices %}
+                    <tr>
+                        <td>{{ price.store.name }}</td>
+                        <td>
+                            <strong>{{ price.discount_price }} {{ price.currency }}</strong>
+                            {% if price.is_history_low %}
+                                <span style="color: green;">🔥</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ price.price }} {{ price.currency }}</td>
+                        <td>
+                            {% if price.discount_percent %}
+                                -{{ price.discount_percent }}%
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if price.store_url %}
+                                <a href="{{ price.store_url }}" target="_blank">Купить</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Нет данных о ценах.</p>
+    {% endif %}
+
+</div>
+{% endblock %}

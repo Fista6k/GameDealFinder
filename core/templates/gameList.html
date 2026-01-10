@@ -25,7 +25,9 @@
         <img src="{{ game.image_url }}" alt="{{ game.title }}">
         {% endif %}
         <div class="game-info">
-            <h2>{{ game.title }}</h2>
+            <a href="{% url 'gameInfo' game.itad_id %}">
+                {{ game.title }}
+            </a>
             <p>Разработчик: {{ game.developer|default:"—" }}</p>
             <p>Издатель: {{ game.publisher|default:"—" }}</p>
             <p>Жанры: {{ game.genres|default:"—" }}</p>

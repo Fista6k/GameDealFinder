@@ -40,9 +40,16 @@ class Command(BaseCommand):
         deals = entry.get("deals", [])
         if not deals:
             return
-        hL = entry.get("historyLow", {}).get("all", {}).get("amount")
-        history_low = Decimal(str(hL)) if hL is not None else None
+        
+        history_low = entry.get("historyLow")
 
+        hL = None
+        if isinstance(history_low, dict):
+            all_low = history_low.get("all")
+            if isinstance(all_low, dict):
+                hL = all_low.get("amount")
+
+        history_low = Decimal(str(hL)) if hL is not None else None
 
         for deal in deals:
             shop_data = deal["shop"]

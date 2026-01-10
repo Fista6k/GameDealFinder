@@ -59,10 +59,8 @@ class Command(BaseCommand):
                 website = "https://store.steampowered.com/"
             elif nameShop == "GOG":
                 website = "https://www.gog.com/"
-            elif nameShop == "Epic Games":
+            elif nameShop == "Epic Game Store":
                 website = "https://store.epicgames.com/"
-            else:
-                continue
             price_data = deal["price"]
             regular_data = deal.get("regular")
 
@@ -78,6 +76,12 @@ class Command(BaseCommand):
             regular_price = Decimal(regular_data["amount"] if regular_data else price)
 
             discount_percent = deal.get("cut", 0)
+
+            lastPrice = (PriceHistory.objects.filter(game=game, store=store, currency=price_data["currency"])).order_by("-recorded_at").first()
+
+            if lastPrice:
+                if lastPrice.discount_price == price:
+                    return
 
             PriceHistory.objects.create(
                 game=game,

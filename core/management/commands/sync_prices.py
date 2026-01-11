@@ -2,9 +2,12 @@ from django.core.management.base import BaseCommand
 from ...models import Game, Store, PriceHistory
 from ...services.itad import ITADClient
 from decimal import Decimal
+from django.utils import timezone
+from datetime import datetime
 
 
 BATCH_SIZE = 200
+DuplicateCheckHours = 1
 
 class Command(BaseCommand):
     help = "Обновление цен из ITAD"
@@ -77,13 +80,7 @@ class Command(BaseCommand):
 
             discount_percent = deal.get("cut", 0)
 
-            lastPrice = (PriceHistory.objects.filter(game=game, store=store, currency=price_data["currency"])).order_by("-recorded_at").first()
-
-            if lastPrice:
-                if lastPrice.discount_price == price:
-                    return
-
-            PriceHistory.objects.create(
+            PriceHistory.objects.update_or_create(
                 game=game,
                 store=store,
                 price=regular_price,

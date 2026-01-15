@@ -1,12 +1,17 @@
 from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator
 from .models import Game, PriceHistory
+import logging
+
+logger = logging.getLogger(__name__)
 
 def gameList(request):
     games = Game.objects.all().prefetch_related("prices", "prices__store")
     for g in games:
         g.latest_price = g.get_current_price()
         g.lowest_price = g.get_lowest_price()
+    
+    logger.debug(games[0])
 
     paginator = Paginator(games, 30)
     page_number = request.GET.get("page")

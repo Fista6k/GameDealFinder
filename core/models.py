@@ -120,7 +120,6 @@ class PriceHistory(models.Model):
     )
 
     recorded_at = models.DateTimeField(
-        auto_now_add=True,
         verbose_name="Время записи"
     )
 
@@ -131,6 +130,14 @@ class PriceHistory(models.Model):
         verbose_name = "История цены"
         verbose_name_plural = "История цен"
         ordering = ["-recorded_at"]
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=["game", "store", "recorded_at"],
+                name="unique_price_snapshot"
+            )
+        ]
+
         indexes = [
             models.Index(fields=["game", "store"]),
             models.Index(fields=["discount_price"]),

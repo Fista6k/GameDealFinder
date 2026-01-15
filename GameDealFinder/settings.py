@@ -80,12 +80,8 @@ WSGI_APPLICATION = 'GameDealFinder.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('PGDATABASE', 'game_deal_finder_vmzm'),
-        'USER': os.environ.get('PGUSER', 'game_deal_finder_vmzm_user'),
-        'PASSWORD': os.environ.get('PGPASSWORD', 'rjreXL40Ur2U4lt8KVDaFygdqmlFkKTA'),
-        'HOST': os.environ.get('PGHOST', 'dpg-d5ho2lqdbo4c73e4qt1g-a.oregon-postgres.render.com'),
-        'PORT': os.environ.get('PGPORT', 5432),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite',
     }
 }
 

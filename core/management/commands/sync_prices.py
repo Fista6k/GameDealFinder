@@ -54,6 +54,8 @@ class Command(BaseCommand):
 
         history_low = Decimal(str(hL)) if hL is not None else None
 
+        new_prices = []
+
         for deal in deals:
             shop_data = deal["shop"]
             nameShop = shop_data["name"]
@@ -80,13 +82,42 @@ class Command(BaseCommand):
 
             discount_percent = deal.get("cut", 0)
 
-            PriceHistory.objects.update_or_create(
+            recorded_at = self.normalize_time(deal["timestamp"])
+
+            priceObj = PriceHistory(
                 game=game,
                 store=store,
+                recorded_at=recorded_at,
                 price=regular_price,
-                discount_price=price,
-                discount_percent=discount_percent,
-                is_history_low = (price==history_low),
-                currency=price_data["currency"],
-                recorded_at=deal["timestamp"]
+                discount_price= price,
+                discount_percent= discount_percent,
+                is_history_low= (price==history_low),
+                currency= price_data["currency"]
             )
+            new_prices.append(priceObj)
+        
+        PriceHistory.objects.bulk_create(
+            new_prices, ignore_conflicts=True
+        )
+
+    @staticmethod
+    def normalize_time(ts, hours=6):
+        if ts is None:
+            return timezone.now()
+        
+        if isinstance(ts, (int, float)) or (isinstance(ts, str) and ts.isdigit()):
+            dt = datetime.fromtimestamp(int(ts), tz=timezone.utc)
+        elif isinstance(ts, str):
+            dt = datetime.fromisoformat(ts)
+
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+        else:
+            return timezone.now()
+        
+        return dt.replace(
+            minute=0,
+            second=0,
+            microsecond=0,
+            hour=(dt.hour // hours) * hours
+        )

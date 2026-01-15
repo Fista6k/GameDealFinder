@@ -38,7 +38,6 @@
                     {% if game.latest_price.discount_price < game.latest_price.price %}
                         <span class="old-price">{{ game.latest_price.price }} {{ game.latest_price.currency }}</span>
                     {% endif %}
-                    в магазине {{ game.latest_price.store.name }}
                 </p>
             {% else %}
                 <p>Цены нет</p>

@@ -1,24 +1,34 @@
 from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator
+from django.db.models import OuterRef, Subquery
 from .models import Game, PriceHistory
 import logging
 
 logger = logging.getLogger(__name__)
 
+
 def gameList(request):
-    games = Game.objects.all().prefetch_related("prices", "prices__store")
-    for g in games:
-        g.latest_price = g.get_current_price()
-        g.lowest_price = g.get_lowest_price()
-    
-    logger.debug(games[0])
+    latest_price = PriceHistory.objects.filter(
+        game=OuterRef("pk")
+    ).order_by("-recorded_at")
+
+    lowest_price = PriceHistory.objects.filter(
+        game=OuterRef("pk")
+    ).order_by("discount_price")
+
+    games = Game.objects.annotate(
+        latest_discount=Subquery(latest_price.values("discount_price")[:1]),
+        latest_price_full=Subquery(latest_price.values("price")[:1]),
+        latest_currency=Subquery(latest_price.values("currency")[:1]),
+        lowest_discount=Subquery(lowest_price.values("discount_price")[:1]),
+    ).only(
+        "id", "title", "image_url", "developer", "publisher", "genres", "itad_id"
+    )
 
     paginator = Paginator(games, 30)
-    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(request.GET.get("page"))
 
-    pageObj = paginator.get_page(page_number)
-    
-    return render(request, "gameList.html", {"page_obj": pageObj})
+    return render(request, "gameList.html", {"page_obj": page_obj})
 
 def gameInfo(request, gameid):
     game = get_object_or_404(Game, itad_id=gameid)

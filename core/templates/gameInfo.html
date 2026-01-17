@@ -1,11 +1,117 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ game.title }} — GameDealFinder</title>
 
-{% block content %}
-<div class="game-detail">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 24px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .game-header {
+            display: flex;
+            gap: 24px;
+        }
+
+        .game-header img {
+            width: 200px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+
+        .game-info h1 {
+            margin-top: 0;
+            margin-bottom: 12px;
+        }
+
+        .game-info p {
+            margin: 6px 0;
+            color: #444;
+        }
+
+        hr {
+            margin: 32px 0;
+            border: none;
+            border-top: 1px solid #ddd;
+        }
+
+        h2 {
+            margin-bottom: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f0f2f4;
+        }
+
+        th, td {
+            padding: 10px 12px;
+            text-align: left;
+        }
+
+        th {
+            font-weight: 600;
+            border-bottom: 2px solid #ddd;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #eee;
+        }
+
+        tbody tr:hover {
+            background: #fafafa;
+        }
+
+        .price {
+            font-weight: bold;
+        }
+
+        .history-low {
+            color: green;
+            font-size: 18px;
+            margin-left: 4px;
+        }
+
+        .buy-link {
+            text-decoration: none;
+            color: #1976d2;
+            font-weight: 600;
+        }
+
+        .buy-link:hover {
+            text-decoration: underline;
+        }
+
+        .empty {
+            color: #777;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
 
     <div class="game-header">
         {% if game.image_url %}
-            <img src="{{ game.image_url }}" alt="{{ game.title }}" width="200">
+            <img src="{{ game.image_url }}" alt="{{ game.title }}">
         {% endif %}
 
         <div class="game-info">
@@ -25,6 +131,9 @@
 
             {% if game.genres %}
                 <p><strong>Жанры:</strong> {{ game.genres }}</p>
+            {% endif %}
+            {% if game.lowest_price %}
+                <p><strong>Исторический минимум цены:</strong> {{ game.lowest_price }} {{ game.lowest_price_currency }}</p>
             {% endif %}
         </div>
     </div>
@@ -49,9 +158,11 @@
                     <tr>
                         <td>{{ price.store.name }}</td>
                         <td>
-                            <strong>{{ price.discount_price }} {{ price.currency }}</strong>
+                            <span class="price">
+                                {{ price.discount_price }} {{ price.currency }}
+                            </span>
                             {% if price.is_history_low %}
-                                <span style="color: green;">🔥</span>
+                                <span class="history-low">🔥</span>
                             {% endif %}
                         </td>
                         <td>{{ price.price }} {{ price.currency }}</td>
@@ -64,7 +175,9 @@
                         </td>
                         <td>
                             {% if price.store_url %}
-                                <a href="{{ price.store_url }}" target="_blank">Купить</a>
+                                <a class="buy-link" href="{{ price.store_url }}" target="_blank">
+                                    Купить
+                                </a>
                             {% endif %}
                         </td>
                     </tr>
@@ -72,8 +185,10 @@
             </tbody>
         </table>
     {% else %}
-        <p>Нет данных о ценах.</p>
+        <p class="empty">Нет данных о ценах.</p>
     {% endif %}
 
 </div>
-{% endblock %}
+
+</body>
+</html>

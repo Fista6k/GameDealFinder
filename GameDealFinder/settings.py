@@ -138,3 +138,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 ITAD_API_KEY = os.getenv("ITAD_API_KEY")
 if not ITAD_API_KEY:
     raise ValueError("ITAD_API_KEY не найден! Проверьте .env файл и load_dotenv()")
+
+AUTH_USER_MODEL = "core.User"
+LOGIN_URL = "/login/"
+LOGIN_REDIRECT_URL = "gameList"
+LOGOUT_REDIRECT_URL = "gameList"

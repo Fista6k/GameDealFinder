@@ -1,10 +1,10 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from django.db.models import OuterRef, Subquery
 from .models import Game, PriceHistory
-import logging
-
-logger = logging.getLogger(__name__)
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
+from .forms import RegisterForm, LoginForm
 
 
 def gameList(request):
@@ -36,3 +36,36 @@ def gameInfo(request, gameid):
     prices = PriceHistory.objects.filter(game=game).select_related("store").order_by("discount_price")
 
     return render(request, "gameInfo.html", {"game": game, "prices": prices})
+
+def register_view(request):
+    if request.method == "POST":
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect("gameList")
+    else:
+        form = RegisterForm()
+
+    return render(request, "register.html", {"form": form})
+
+def login_view(request):
+    if request.method == "POST":
+        form = LoginForm(data = request.POST)
+        
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            return redirect("gameList")
+    else:
+        form = LoginForm()
+    
+    return render(request, "login.html", {"form":form})
+
+def logout_view(request):
+    logout(request)
+    return redirect("gameList")
+
+@login_required
+def profile_view(request):
+    return render(request, "profile.html")

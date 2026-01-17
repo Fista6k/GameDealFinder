@@ -1,5 +1,26 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.contrib.auth.models import AbstractUser
+
+
+class Store(models.Model):
+    itad_id = models.CharField(
+        max_length=50,
+        unique=True,
+        null=True,
+        verbose_name="ITAD shop id"
+    )
+
+    name = models.CharField(max_length=100, verbose_name="Название")
+    website = models.URLField(verbose_name="Сайт")
+    is_active = models.BooleanField(default=True, verbose_name="Активен")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Магазин"
+        verbose_name_plural = "Магазины"
 
 
 class Game(models.Model):
@@ -17,6 +38,9 @@ class Game(models.Model):
     publisher = models.CharField(max_length=512, blank=True, verbose_name="Издатель")
 
     image_url = models.URLField(blank=True, verbose_name="Обложка")
+
+    lowest_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    lowest_price_currency = models.CharField(max_length=3, default="USD", null=True, blank=True)
 
     genres = models.CharField(
         max_length=512,
@@ -48,27 +72,6 @@ class Game(models.Model):
     class Meta:
         verbose_name = "Игра"
         verbose_name_plural = "Игры"
-
-
-class Store(models.Model):
-    itad_id = models.CharField(
-        max_length=50,
-        unique=True,
-        null=True,
-        verbose_name="ITAD shop id"
-    )
-
-    name = models.CharField(max_length=100, verbose_name="Название")
-    website = models.URLField(verbose_name="Сайт")
-    is_active = models.BooleanField(default=True, verbose_name="Активен")
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = "Магазин"
-        verbose_name_plural = "Магазины"
-
 
 class PriceHistory(models.Model):
     game = models.ForeignKey(
@@ -142,3 +145,13 @@ class PriceHistory(models.Model):
             models.Index(fields=["game", "store"]),
             models.Index(fields=["discount_price"]),
         ]
+
+class User(AbstractUser):
+    email = models.EmailField(unique=True, verbose_name="Email")
+
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["username"]
+
+    class Meta:
+        verbose_name = "Пользователь"
+        verbose_name_plural = "Пользователи"

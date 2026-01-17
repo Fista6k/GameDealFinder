@@ -47,12 +47,19 @@ class Command(BaseCommand):
         history_low = entry.get("historyLow")
 
         hL = None
+        hlCurr = None
         if isinstance(history_low, dict):
             all_low = history_low.get("all")
             if isinstance(all_low, dict):
                 hL = all_low.get("amount")
+                hlCurr = all_low.get("currency")
 
         history_low = Decimal(str(hL)) if hL is not None else None
+
+        if game.lowest_price is None:
+            game.lowest_price = history_low
+            game.lowest_price_currency = hlCurr
+            game.save(update_fields=["lowest_price", "lowest_price_currency"])
 
         new_prices = []
 

@@ -16,6 +16,10 @@ class Command(BaseCommand):
 
             for game in results:
                 gameInfo = client.get_game_info(game["id"])
+
+                if gameInfo is None:
+                    continue
+                
                 slug = gameInfo.get("slug", "")
                 if not slug:
                     continue

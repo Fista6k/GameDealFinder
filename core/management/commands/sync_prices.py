@@ -33,6 +33,9 @@ class Command(BaseCommand):
     def sync_batch(self, gameIds, game_map):
         client = ITADClient()
         data = client.get_prices(gameIds)
+        if data is None:
+            return
+
         for item in data:
             game = game_map.get(item["id"])
             if not game:

@@ -31,9 +31,6 @@
             <p>Разработчик: {{ game.developer|default:"—" }}</p>
             <p>Издатель: {{ game.publisher|default:"—" }}</p>
             <p>Жанры: {{ game.genres|default:"—" }}</p>
-            {% if game.lowest_price and game.lowest_price != game.latest_price %}
-                <p>Минимальная цена: {{ game.lowest_price.discount_price }} {{ game.lowest_price.currency }} ({{ game.lowest_price.store.name }})</p>
-            {% endif %}
         </div>
     </div>
     {% endfor %}

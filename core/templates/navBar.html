@@ -1,0 +1,59 @@
+<nav style="
+    background: #1e1e1e;
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+">
+    <div>
+        <a href="{% url 'gameList' %}" style="
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 20px;
+            font-weight: bold;
+        ">
+            🎮 GameDealFinder
+        </a>
+    </div>
+
+    <div style="display: flex; gap: 16px; align-items: center;">
+        {% if request.user.is_authenticated %}
+            <span style="color: #ccc;">
+                {{ request.user.email }}
+            </span>
+
+            <a href="{% url 'profile' %}" style="
+                color: #4caf50;
+                text-decoration: none;
+                font-weight: bold;
+            ">
+                Профиль
+            </a>
+
+            <a href="{% url 'logout' %}" style="
+                color: #ff5252;
+                text-decoration: none;
+                font-weight: bold;
+            ">
+                Выйти
+            </a>
+        {% else %}
+            <a href="{% url 'login' %}" style="
+                color: #4caf50;
+                text-decoration: none;
+                font-weight: bold;
+            ">
+                Вход
+            </a>
+
+            <a href="{% url 'register' %}" style="
+                color: #2196f3;
+                text-decoration: none;
+                font-weight: bold;
+            ">
+                Регистрация
+            </a>
+        {% endif %}
+    </div>
+</nav>
+    

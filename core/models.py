@@ -155,3 +155,18 @@ class User(AbstractUser):
     class Meta:
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
+
+class WaitList(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="waitlist_items")
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="waitlisted_by")
+    target_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name="Желаемая цена")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "game")
+        verbose_name = "Вейтлист"
+        verbose_name_plural = "Вейтлисты"
+
+    def __str__(self):
+        return f"{self.user.email} -> {self.game.title}"

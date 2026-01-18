@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Мой вейтлист</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 40px;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .game {
+            background: white;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 10px;
+            display: flex;
+            gap: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        img {
+            width: 90px;
+            border-radius: 6px;
+        }
+        .info {
+            flex: 1;
+        }
+        .price {
+            font-weight: bold;
+            color: green;
+        }
+        .remove {
+            color: #dc2626;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .empty {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Мой вейтлист</h1>
+        <a href="{% url 'profile' %}">← Назад в профиль</a>
+    </div>
+
+    {% if waitlist %}
+        {% for item in waitlist %}
+            <div class="game">
+                {% if item.game.image_url %}
+                    <img src="{{ item.game.image_url }}" alt="{{ item.game.title }}">
+                {% endif %}
+
+                <div class="info">
+                    <h3>
+                        <a href="{% url 'gameInfo' item.game.itad_id %}">
+                            {{ item.game.title }}
+                        </a>
+                    </h3>
+
+                    {% if item.target_price %}
+                        <p>Желаемая цена: {{ item.target_price }} $</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <a class="remove" href="{% url 'remove_from_waitlist' item.game.itad_id %}">
+                        ❌ Убрать
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty">
+            <h3>Вейтлист пуст</h3>
+            <p>Добавь игры, чтобы следить за ценами</p>
+            <a href="{% url 'gameList' %}">Перейти к играм</a>
+        </div>
+    {% endif %}
+</div>
+
+</body>
+</html>

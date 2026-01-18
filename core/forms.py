@@ -18,3 +18,15 @@ class RegisterForm(UserCreationForm):
 
 class LoginForm(AuthenticationForm):
     username = forms.EmailField(label="Email")
+
+class WaitlistForm(forms.Form):
+    target_price = forms.DecimalField(
+        label="Желаемая цена в баксах",
+        required=False,
+        min_value=0,
+        decimal_places=2,
+        widget=forms.NumberInput(attrs={
+            "step": "0.01",
+            "placeholder": "Пример: 9.99"
+        })
+    )

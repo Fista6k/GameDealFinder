@@ -1,10 +1,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from django.db.models import OuterRef, Subquery
-from .models import Game, PriceHistory
+from .models import Game, PriceHistory, WaitList
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
-from .forms import RegisterForm, LoginForm
+from .forms import RegisterForm, LoginForm, WaitlistForm
 
 
 def gameList(request):
@@ -33,9 +33,16 @@ def gameList(request):
 def gameInfo(request, gameid):
     game = get_object_or_404(Game, itad_id=gameid)
 
+    in_waitlist = False
+    if request.user.is_authenticated:
+        in_waitlist = WaitList.objects.filter(
+            user = request.user,
+            game=game
+        ).exists()
+
     prices = PriceHistory.objects.filter(game=game).select_related("store").order_by("discount_price")
 
-    return render(request, "gameInfo.html", {"game": game, "prices": prices})
+    return render(request, "gameInfo.html", {"game": game, "prices": prices, "game_in_waitlist": in_waitlist})
 
 def register_view(request):
     if request.method == "POST":
@@ -69,3 +76,43 @@ def logout_view(request):
 @login_required
 def profile_view(request):
     return render(request, "profile.html")
+
+@login_required
+def add_to_waitlist(request, gameid):
+    game = get_object_or_404(Game, itad_id=gameid)
+
+    if request.method == "POST":
+        form = WaitlistForm(request.POST)
+
+        if form.is_valid():
+            target_price = form.cleaned_data["target_price"]
+
+            WaitList.objects.get_or_create(
+                user = request.user,
+                game=game,
+                defaults={"target_price": target_price}
+            )
+
+            return redirect("waitlist")
+    else:
+        form = WaitlistForm()
+
+    return render(request, "add_to_waitlist.html", {"form": form, "game": game})
+
+@login_required
+def remove_from_waitlist(request, gameid):
+    game = get_object_or_404(Game, itad_id=gameid)
+    WaitList.objects.filter(
+        user=request.user,
+        game=game
+    ).delete()
+
+    return redirect("profile")
+
+@login_required
+def waitlist_view(request):
+    waitlist = (
+        WaitList.objects.filter(user=request.user).select_related("game").order_by("-created_at")
+    )
+
+    return render(request, "waitlist.html", {"waitlist": waitlist})

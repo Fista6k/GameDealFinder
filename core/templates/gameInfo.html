@@ -186,6 +186,15 @@
                 {% endfor %}
             </tbody>
         </table>
+        {% if user.is_authenticated %}
+            {% if game_in_waitlist %}
+                <a href="{% url 'remove_from_waitlist' game.itad_id %}">Добавлена в вейтлист</a>
+            {% else %}
+                <a href="{% url 'add_to_waitlist' game.itad_id %}">Добавить в вейтлист</a>
+            {% endif %}
+        {% else %}
+            <a href="{% url 'login' %}">Войдите, чтобы добавить в вейтлист</a>
+        {% endif %}
     {% else %}
         <p class="empty">Нет данных о ценах.</p>
     {% endif %}

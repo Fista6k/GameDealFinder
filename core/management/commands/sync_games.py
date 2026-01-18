@@ -38,8 +38,8 @@ class Command(BaseCommand):
                         "itad_id": game.get("id", ""),
                         "title": game.get("title", ""),
                         "release_date": gameInfo.get("releaseDate", ""),
-                        "developer": devs,
-                        "publisher": publishers,
+                        "developer": ", ".join(devs),
+                        "publisher": ", ".join(publishers),
                         "genres": ", ".join(gameInfo.get("tags", {})),
                         "image_url": game.get("assets", {}).get("boxart", "")
                     }

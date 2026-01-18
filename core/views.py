@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
-from django.db.models import OuterRef, Subquery
+from django.db.models import OuterRef, Subquery, Q
 from .models import Game, PriceHistory, WaitList
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
@@ -8,6 +8,14 @@ from .forms import RegisterForm, LoginForm, WaitlistForm
 
 
 def gameList(request):
+    query = request.GET.get("q", "")
+
+    games = Game.objects.all()
+    if query:
+        games = games.filter(
+            Q(title__icontains=query) | Q(developer__icontains=query) | Q(publisher__icontains=query)
+        )
+
     latest_price = PriceHistory.objects.filter(
         game=OuterRef("pk")
     ).order_by("-recorded_at")
@@ -16,7 +24,7 @@ def gameList(request):
         game=OuterRef("pk")
     ).order_by("discount_price")
 
-    games = Game.objects.annotate(
+    games = games.annotate(
         latest_discount=Subquery(latest_price.values("discount_price")[:1]),
         latest_price_full=Subquery(latest_price.values("price")[:1]),
         latest_currency=Subquery(latest_price.values("currency")[:1]),

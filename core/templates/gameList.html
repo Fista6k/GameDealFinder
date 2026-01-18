@@ -20,6 +20,10 @@
 <body>
 <div class="container">
     <h1>GameDealFinder — Игры</h1>
+    <form method="get" action="">
+        <input type="text" name="q" placeholder="Поиск игр..." value="{{ query|default:'' }}">
+        <button type="submit">Найти</button>
+    </form>
 
     {% for game in page_obj %}
     <div class="game">

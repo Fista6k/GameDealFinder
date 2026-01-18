@@ -24,7 +24,7 @@ load_dotenv(dotenv_path=BASE_DIR / '.env')
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure--jk0$n3^5e$v624n$l22h1o_o$29$8hd*-t1)8$6*kdvbiy=l^')
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "True") == "True"
@@ -143,3 +143,13 @@ AUTH_USER_MODEL = "core.User"
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "gameList"
 LOGOUT_REDIRECT_URL = "gameList"
+
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND")
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = os.getenv("EMAIL_PORT")
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

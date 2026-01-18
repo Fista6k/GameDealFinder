@@ -163,6 +163,9 @@ class WaitList(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    is_notified = models.BooleanField(default=False)
+    notified_at = models.DateTimeField(null=True, blank=True)
+
     class Meta:
         unique_together = ("user", "game")
         verbose_name = "Вейтлист"

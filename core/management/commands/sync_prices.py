@@ -1,7 +1,8 @@
 from django.core.management.base import BaseCommand
-from ...models import Game, Store, PriceHistory
+from ...models import Game, Store, PriceHistory, WaitList
 from ...services.itad import ITADClient
-from decimal import Decimal
+from ...services import email
+from decimal import Decimal, ROUND_HALF_UP
 from django.utils import timezone
 from datetime import datetime
 
@@ -59,56 +60,45 @@ class Command(BaseCommand):
 
         history_low = Decimal(str(hL)) if hL is not None else None
 
-        if game.lowest_price is None:
+        if history_low and (game.lowest_price is None or history_low < game.lowest_price):
             game.lowest_price = history_low
             game.lowest_price_currency = hlCurr
             game.save(update_fields=["lowest_price", "lowest_price_currency"])
 
-        new_prices = []
-
         for deal in deals:
             shop_data = deal["shop"]
             nameShop = shop_data["name"]
-            website = ""
-            if nameShop == "Steam":
-                website = "https://store.steampowered.com/"
-            elif nameShop == "GOG":
-                website = "https://www.gog.com/"
-            elif nameShop == "Epic Game Store":
-                website = "https://store.epicgames.com/"
             price_data = deal["price"]
             regular_data = deal.get("regular")
 
             store, _ = Store.objects.get_or_create(
                 itad_id = shop_data["id"],
                 defaults={
-                    "name": nameShop,
-                    "website": website
+                    "name": nameShop
                 }
             )
 
-            price = Decimal(price_data["amount"])
+            price = Decimal(price_data["amount"]).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
             regular_price = Decimal(regular_data["amount"] if regular_data else price)
 
             discount_percent = deal.get("cut", 0)
 
             recorded_at = self.normalize_time(deal["timestamp"])
 
-            priceObj = PriceHistory(
+            priceObj, created = PriceHistory.objects.update_or_create(
                 game=game,
                 store=store,
                 recorded_at=recorded_at,
-                price=regular_price,
-                discount_price= price,
-                discount_percent= discount_percent,
-                is_history_low= (price==history_low),
-                currency= price_data["currency"]
+                defaults={
+                    "price": regular_price,
+                    "discount_price": price,
+                    "discount_percent": discount_percent,
+                    "is_history_low": (price==history_low),
+                    "currency": price_data["currency"]
+                }
             )
-            new_prices.append(priceObj)
-        
-        PriceHistory.objects.bulk_create(
-            new_prices, ignore_conflicts=True
-        )
+
+            self.check_waitlist_notifications(game, price)
 
     @staticmethod
     def normalize_time(ts, hours=6):
@@ -131,3 +121,18 @@ class Command(BaseCommand):
             microsecond=0,
             hour=(dt.hour // hours) * hours
         )
+    
+    @staticmethod
+    def check_waitlist_notifications(game, price):
+        waitlist_items = WaitList.objects.filter(
+            game=game,
+            target_price__gte=price,
+            is_notified=False,
+        ).select_related("user")
+
+        for item in waitlist_items:
+            email.send_price_email(item.user, game, price)
+
+            item.is_notified=True
+            item.notified_at=timezone.now()
+            item.save(update_fields=["is_notified", "notified_at"])

@@ -2,24 +2,24 @@
 GameDealFinder — это Django-приложение для отслеживания цен на игры в разных магазинах с возможностью добавления игр в вейтлист и получения email-уведомлений при достижении желаемой цены.
 
 ## Технологии
-Python 3.13.9
-Django 6.0
-requests 2.32.5
-Postgres 18
+* Python 3.13.9
+* Django 6.0
+* requests 2.32.5
+* Postgres 18  
 ## Скриншоты страниц
-Главная страница
+- Главная страница  
   Здесь можно видеть список различных игр
   <img width="1903" height="869" alt="image" src="https://github.com/user-attachments/assets/daa3f6e7-9473-4deb-82aa-3f91068f59fc" />
 
-Страница игры
+- Страница игры  
   Здесь можно ознакомиться с ценами в разных магазинах и добавить игру в лист ожидания (вейтлист)
   <img width="1897" height="853" alt="image" src="https://github.com/user-attachments/assets/4817ccc8-bf49-42ee-8083-5e8e9436e302" />
 
-Страница профиля
+- Страница профиля  
   Здесь можно посмотреть свою информацию, включая ваш вейтлист
   <img width="1916" height="457" alt="image" src="https://github.com/user-attachments/assets/5ae94f5c-7cef-4e9d-b604-04c3b77b70ce" />
 
-Страница вейтлиста
+- Страница вейтлиста  
   Здесь можно видеть игры, которые были добавлены в лист ожидания
   <img width="1917" height="689" alt="image" src="https://github.com/user-attachments/assets/77010f98-4a4c-4413-9765-74f43b24e496" />
   <img width="1919" height="762" alt="image" src="https://github.com/user-attachments/assets/75aaa460-a276-4f97-bea0-9fdb9655cf91" />
@@ -31,20 +31,20 @@ Postgres 18
 https://github.com/Fista6k/GameDealFinder.git
 ```
 
-3. Создать виртуальное окружение  
+2. Создать виртуальное окружение  
 ```
 python -m venv venv
 venv\Scripts\activate
 ```
 
-4. Установить зависимости  
+3. Установить зависимости  
 ```
 pip install -r requirements.txt
 ```
 
-5. Задать переменные окружения  
-   4.1 Создать в корне проекта файл .env  
-   4.2 В этом файле задать следующие переменные:  
+4. Задать переменные окружения  
+    - Создать в корне проекта файл .env  
+    - В этом файле задать следующие переменные:  
      SECRET_KEY - ключ, которые генерируется при создании проекта (по дефолту должен находиться в файле settings.py)  
      ALLOWED_HOST - список доменов, с которых Django позволяет принимать запросы (пример: 127.0.0.1, localhost)  
      DEBUG - режим откладки Django, локально ставим True, на прод ставим False
@@ -66,20 +66,20 @@ pip install -r requirements.txt
      DEFAULT_FROM_EMAIL - email, который будет указан в поле "From"  
        
      ITAD_API_KEY - API-ключ сервиса IsThereAnyDeal (Для получения следуйте сюда -> https://isthereanydeal.com/apps/, необходимо зарегистрироваться самому и зарегистрировать свое приложение)  
-7. Создаем миграции и суперюзера  
+5. Создаем миграции и суперюзера  
 ```
 python manage.py makemigrations
 python manage.py migrate
 python manage.py createsuperuser
 ```
 
-7. Загружаем данные в бд  
-  6.1 Сначала игры
+6. Загружаем данные в бд  
+  - Сначала игры
   ```
   python manage.py sync_games
   ```
   
-  6.2 После цены к этим играм  
+  - После цены к этим играм  
   ```
   python manage.py sync_prices
   ```

@@ -3,7 +3,7 @@ GameDealFinder — это Django-приложение для отслежива�
 
 ## Технологии
 * Python 3.13.9
-* Django 6.0
+* Django 4.2.27
 * requests 2.32.5
 * Postgres 18  
 ## Скриншоты страниц

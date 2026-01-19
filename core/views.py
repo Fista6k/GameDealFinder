@@ -115,7 +115,7 @@ def remove_from_waitlist(request, gameid):
         game=game
     ).delete()
 
-    return redirect("profile")
+    return redirect("waitlist")
 
 @login_required
 def waitlist_view(request):

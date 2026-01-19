@@ -1,0 +1,130 @@
+body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: #0f0f0f;
+    color: #eee;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 40px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #111;
+    padding: 16px 40px;
+    border-bottom: 1px solid #333;
+    margin-bottom: 20px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #fff;
+}
+
+header a {
+    text-decoration: none;
+    color: #fff;
+    border-bottom: 1px solid #fff;
+    font-weight: 600;
+    transition: opacity 0.2s;
+}
+
+header a:hover {
+    opacity: 0.6;
+}
+
+.game {
+    background-color: #1d1d1d;
+    padding: 20px;
+    margin-top: 15px;
+    border-radius: 10px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    border: 1px solid #333;
+}
+
+.game img {
+    width: 90px;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
+.info {
+    flex: 1;
+}
+
+.info h3 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.info h3 a {
+    color: #fff;
+    text-decoration: none;
+    border-bottom: 1px solid #fff;
+    transition: opacity 0.2s;
+}
+
+.info h3 a:hover {
+    opacity: 0.6;
+}
+
+.info p {
+    margin: 4px 0;
+    color: #ccc;
+    font-size: 14px;
+}
+
+.remove {
+    color: #dc2626;
+    text-decoration: none;
+    font-size: 14px;
+    transition: opacity 0.2s;
+}
+
+.remove:hover {
+    opacity: 0.6;
+}
+
+.empty {
+    background-color: #1d1d1d;
+    padding: 30px;
+    border-radius: 10px;
+    margin-top: 20px;
+    text-align: center;
+    border: 1px solid #333;
+}
+
+.empty h3 {
+    margin: 0 0 10px;
+    font-size: 20px;
+    color: #fff;
+}
+
+.empty p {
+    margin: 0 0 15px;
+    color: #ccc;
+    font-size: 14px;
+}
+
+.empty a {
+    color: #fff;
+    text-decoration: none;
+    border-bottom: 1px solid #fff;
+    font-weight: 600;
+    transition: opacity 0.2s;
+}
+
+.empty a:hover {
+    opacity: 0.6;
+}

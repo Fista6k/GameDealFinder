@@ -1,116 +1,12 @@
+{% extends "base.html" %}
 {% load static %}
-{% include "navBar.html" %}
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ game.title }} — GameDealFinder</title>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f6f8;
-            margin: 0;
-            padding: 0;
-        }
+{% block title %}{{ game.title }} — GameDealFinder{% endblock %}
 
-        .container {
-            max-width: 1000px;
-            margin: 40px auto;
-            background: #fff;
-            padding: 24px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-
-        .game-header {
-            display: flex;
-            gap: 24px;
-        }
-
-        .game-header img {
-            width: 200px;
-            border-radius: 6px;
-            object-fit: cover;
-        }
-
-        .game-info h1 {
-            margin-top: 0;
-            margin-bottom: 12px;
-        }
-
-        .game-info p {
-            margin: 6px 0;
-            color: #444;
-        }
-
-        hr {
-            margin: 32px 0;
-            border: none;
-            border-top: 1px solid #ddd;
-        }
-
-        h2 {
-            margin-bottom: 16px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        thead {
-            background: #f0f2f4;
-        }
-
-        th, td {
-            padding: 10px 12px;
-            text-align: left;
-        }
-
-        th {
-            font-weight: 600;
-            border-bottom: 2px solid #ddd;
-        }
-
-        tbody tr {
-            border-bottom: 1px solid #eee;
-        }
-
-        tbody tr:hover {
-            background: #fafafa;
-        }
-
-        .price {
-            font-weight: bold;
-        }
-
-        .history-low {
-            color: green;
-            font-size: 18px;
-            margin-left: 4px;
-        }
-
-        .buy-link {
-            text-decoration: none;
-            color: #1976d2;
-            font-weight: 600;
-        }
-
-        .buy-link:hover {
-            text-decoration: underline;
-        }
-
-        .empty {
-            color: #777;
-            font-style: italic;
-        }
-    </style>
-</head>
-<body>
-
-<div class="container">
-
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/gameInfo.css' %}">
+{% endblock %}
+{% block content %}
     <div class="game-header">
         {% if game.image_url %}
             <img src="{{ game.image_url }}" alt="{{ game.title }}">
@@ -134,8 +30,12 @@
             {% if game.genres %}
                 <p><strong>Жанры:</strong> {{ game.genres }}</p>
             {% endif %}
+
             {% if game.lowest_price %}
-                <p><strong>Исторический минимум цены:</strong> {{ game.lowest_price }} {{ game.lowest_price_currency }}</p>
+                <p class="lowest-price">
+                    <strong>Исторический минимум:</strong>
+                    {{ game.lowest_price }} {{ game.lowest_price_currency }}
+                </p>
             {% endif %}
         </div>
     </div>
@@ -145,7 +45,7 @@
     <h2>Цены</h2>
 
     {% if prices %}
-        <table>
+        <table class="price-table">
             <thead>
                 <tr>
                     <th>Магазин</th>
@@ -159,12 +59,10 @@
                 {% for price in prices %}
                     <tr>
                         <td>{{ price.store.name }}</td>
-                        <td>
-                            <span class="price">
-                                {{ price.discount_price }} {{ price.currency }}
-                            </span>
+                        <td class="price-cell">
+                            {{ price.discount_price }} {{ price.currency }}
                             {% if price.is_history_low %}
-                                <span class="history-low">🔥</span>
+                                <span class="history-low">★</span>
                             {% endif %}
                         </td>
                         <td>{{ price.price }} {{ price.currency }}</td>
@@ -186,20 +84,26 @@
                 {% endfor %}
             </tbody>
         </table>
-        {% if user.is_authenticated %}
-            {% if game_in_waitlist %}
-                <a href="{% url 'remove_from_waitlist' game.itad_id %}">Добавлена в вейтлист</a>
+
+        <div class="waitlist">
+            {% if user.is_authenticated %}
+                {% if game_in_waitlist %}
+                    <a class="waitlist-active" href="{% url 'remove_from_waitlist' game.itad_id %}">
+                        Убрать из вейтлиста
+                    </a>
+                {% else %}
+                    <a href="{% url 'add_to_waitlist' game.itad_id %}">
+                        Добавить в вейтлист
+                    </a>
+                {% endif %}
             {% else %}
-                <a href="{% url 'add_to_waitlist' game.itad_id %}">Добавить в вейтлист</a>
+                <a href="{% url 'login' %}">
+                    Войдите, чтобы добавить в вейтлист
+                </a>
             {% endif %}
-        {% else %}
-            <a href="{% url 'login' %}">Войдите, чтобы добавить в вейтлист</a>
-        {% endif %}
+        </div>
+
     {% else %}
         <p class="empty">Нет данных о ценах.</p>
     {% endif %}
-
-</div>
-
-</body>
-</html>
+{% endblock %}

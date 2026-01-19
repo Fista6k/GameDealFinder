@@ -1,47 +1,56 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>Регистрация</title>
+    <link rel="stylesheet" href="{% static 'css/register.css' %}">
 </head>
 <body>
-    <h1>Регистрация</h1>
 
-    <form method="post">
-        {% csrf_token %}
+<header>
+    <h1>GameDealFinder</h1>
+    <a href="{% url 'gameList' %}">К списку игр</a>
+</header>
 
-        {{ form.non_field_errors }}
+<div class="container">
+    <div class="card">
+        <h2>Регистрация</h2>
 
-        <p>
-            {{ form.username.label_tag }}<br>
-            {{ form.username }}
-            {{ form.username.errors }}
-        </p>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
 
-        <p>
-            {{ form.email.label_tag }}<br>
-            {{ form.email }}
-            {{ form.email.errors }}
-        </p>
+            <p>
+                {{ form.username.label_tag }}<br>
+                {{ form.username }}
+                {{ form.username.errors }}
+            </p>
 
-        <p>
-            {{ form.password1.label_tag }}<br>
-            {{ form.password1 }}
-            {{ form.password1.errors }}
-        </p>
+            <p>
+                {{ form.email.label_tag }}<br>
+                {{ form.email }}
+                {{ form.email.errors }}
+            </p>
 
-        <p>
-            {{ form.password2.label_tag }}<br>
-            {{ form.password2 }}
-            {{ form.password2.errors }}
-        </p>
+            <p>
+                {{ form.password1.label_tag }}<br>
+                {{ form.password1 }}
+                {{ form.password1.errors }}
+            </p>
 
-        <button type="submit">Зарегистрироваться</button>
-    </form>
+            <p>
+                {{ form.password2.label_tag }}<br>
+                {{ form.password2 }}
+                {{ form.password2.errors }}
+            </p>
 
-    <p>
-        Уже есть аккаунт?
-        <a href="{% url 'login' %}">Войти</a>
-    </p>
+            <button type="submit">Зарегистрироваться</button>
+        </form>
+
+        <a class="card-link" href="{% url 'login' %}">Уже есть аккаунт? Войти</a>
+    </div>
+</div>
+
 </body>
 </html>

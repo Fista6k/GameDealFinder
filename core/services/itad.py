@@ -1,6 +1,6 @@
 import requests
 from django.conf import settings
-from requests.exceptions import RequestException, Timeout
+from requests.exceptions import Timeout
 import time
 
 

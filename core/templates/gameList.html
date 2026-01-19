@@ -1,61 +1,69 @@
+{% extends "base.html" %}
 {% load static %}
-{% include "navBar.html" %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>GameDealFinder — Игры</title>
-    <style>
-        body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 0; }
-        .container { width: 90%; margin: auto; padding: 20px; }
-        h1 { text-align: center; }
-        .game { display: flex; background: #fff; padding: 10px; margin: 10px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .game img { width: 100px; height: 140px; object-fit: cover; border-radius: 4px; }
-        .game-info { margin-left: 20px; flex: 1; }
-        .game-info h2 { margin: 0 0 10px 0; font-size: 18px; }
-        .price { font-weight: bold; color: green; }
-        .old-price { text-decoration: line-through; color: red; margin-left: 10px; }
-    </style>
-</head>
-<body>
-<div class="container">
-    <h1>GameDealFinder — Игры</h1>
-    <form method="get" action="">
-        <input type="text" name="q" placeholder="Поиск игр..." value="{{ query|default:'' }}">
-        <button type="submit">Найти</button>
-    </form>
 
+{% block title %}Игры — GameDealFinder{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/gameList.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Игры</h1>
+
+<form method="get" class="search-form">
+    <input
+        type="text"
+        name="q"
+        value="{{ request.GET.q }}"
+        placeholder="Поиск игры"
+        class="search-input"
+    >
+    <button type="submit" class="search-button">
+        Найти
+    </button>
+</form>
+
+<div class="game-list">
     {% for game in page_obj %}
-    <div class="game">
-        {% if game.image_url %}
-        <img src="{{ game.image_url }}" alt="{{ game.title }}">
-        {% endif %}
-        <div class="game-info">
-            <a href="{% url 'gameInfo' game.itad_id %}">
-                {{ game.title }}
-            </a>
-            <p>Разработчик: {{ game.developer|default:"—" }}</p>
-            <p>Издатель: {{ game.publisher|default:"—" }}</p>
-            <p>Жанры: {{ game.genres|default:"—" }}</p>
+        <div class="game-card">
+            {% if game.image_url %}
+                <img
+                    src="{{ game.image_url }}"
+                    alt="{{ game.title }}"
+                    class="game-image"
+                >
+            {% endif %}
+
+            <div class="game-info">
+                <a href="{% url 'gameInfo' game.itad_id %}" class="game-title">
+                    {{ game.title }}
+                </a>
+
+                <div class="game-meta">
+                    <div>Разработчик: {{ game.developer|default:"—" }}</div>
+                    <div>Издатель: {{ game.publisher|default:"—" }}</div>
+                    <div>Жанры: {{ game.genres|default:"—" }}</div>
+                </div>
+            </div>
         </div>
-    </div>
+    {% empty %}
+        <p class="empty-text">Игры не найдены.</p>
     {% endfor %}
-    <div class="pagination">
-
-        {% if page_obj.has_previous %}
-            <a href="?page=1">« Первая</a>
-            <a href="?page={{ page_obj.previous_page_number }}">‹ Назад</a>
-        {% endif %}
-
-        <span>
-            Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
-        </span>
-
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}">Вперёд ›</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}">Последняя »</a>
-        {% endif %}
-    </div>
 </div>
-</body>
-</html>
+
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page=1" class="page-link">« Первая</a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="page-link">‹ Назад</a>
+    {% endif %}
+
+    <span class="page-info">
+        Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+    </span>
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="page-link">Вперёд ›</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="page-link">Последняя »</a>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,36 +1,44 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>Вход</title>
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
 </head>
 <body>
-    <h1>Вход</h1>
 
-    <form method="post">
-        {% csrf_token %}
+<header>
+    <h1>GameDealFinder</h1>
+    <a href="{% url 'gameList' %}">К списку игр</a>
+</header>
 
-        {{ form.non_field_errors }}
+<div class="container">
+    <div class="card">
+        <h2>Вход</h2>
 
-        <p>
-            {{ form.username.label_tag }}<br>
-            {{ form.username }}
-            {{ form.username.errors }}
-        </p>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
 
-        <p>
-            {{ form.password.label_tag }}<br>
-            {{ form.password }}
-            {{ form.password.errors }}
-        </p>
+            <p>
+                {{ form.username.label_tag }}<br>
+                {{ form.username }}
+                {{ form.username.errors }}
+            </p>
 
-        <button type="submit">Войти</button>
-    </form>
+            <p>
+                {{ form.password.label_tag }}<br>
+                {{ form.password }}
+                {{ form.password.errors }}
+            </p>
 
-    <p>
-        Нет аккаунта?
-        <a href="{% url 'register' %}">Зарегистрироваться</a>
-    </p>
-    <a href="{% url 'gameList' %}">Назад к списку игр</a>
+            <button type="submit">Войти</button>
+        </form>
+
+        <a href="{% url 'register' %}">Нет аккаунта? Зарегистрироваться</a>
+    </div>
+</div>
+
 </body>
 </html>

@@ -1,0 +1,18 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}GameDealFinder{% endblock %}</title>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    {% include "navbar.html" %}
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
